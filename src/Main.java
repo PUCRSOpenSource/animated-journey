@@ -6,6 +6,7 @@ public class Main {
         Ambiente a = new Ambiente();
         a.carregaArquivo("labirintos/labirinto1_10.txt");
         a.printMapa();
+        a.printMapa();
     }
 
 

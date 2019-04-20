@@ -1,8 +1,9 @@
+import javafx.geometry.Pos;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 
 public class Ambiente {
 
@@ -39,7 +40,7 @@ public class Ambiente {
                         case "E":
                             mapa[i][j] = Posicao.E;
                             entrada = new Ponto(j, i);
-                            agente = new Agente(new Ponto(j, i));
+                            agente = new Agente(new Ponto(j, i), this);
                             break;
                         case "S":
                             mapa[i][j] = Posicao.S;
@@ -60,9 +61,18 @@ public class Ambiente {
         a[agente.getPosicao().getY()][agente.getPosicao().getX()] = Posicao.A;
         for (int i = 0; i < dimensao; i++) {
             for (int j = 0; j < dimensao; j++) {
-                System.out.print(a[i][j] + " ");
+                System.out.print(a[i][j] + "  ");
             }
             System.out.print("\n");
         }
+        System.out.print("\n");
+        agente.move(new Ponto(2,1));
+    }
+
+    public void moveAgente(Ponto de, Ponto para) {
+        mapa[de.getY()][para.getX()] = Posicao.V;
+        mapa[entrada.getY()][entrada.getX()] = Posicao.E;
+        mapa[saida.getY()][saida.getX()] = Posicao.S;
+        mapa[para.getY()][para.getX()] = Posicao.A;
     }
 }
