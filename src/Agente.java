@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Agente {
 
@@ -7,6 +8,8 @@ public class Agente {
     private Direcao direcao;
     private Ambiente ambiente;
     private ArrayList<Ponto> lugaresVisitados;
+    private double temperatura;
+    private double taxaResfriamento;
 
     public Agente(Ponto posicao, Ambiente ambiente) {
         this.posicao = posicao;
@@ -14,6 +17,8 @@ public class Agente {
         lugaresVisitados.add(posicao);
         this.ambiente = ambiente;
         direcao = Direcao.NORTH;
+        temperatura = 10000000;
+        taxaResfriamento = 0.003;
     }
 
     public Ponto getPosicao() {
@@ -28,6 +33,11 @@ public class Agente {
 
     /* Logica feliz do algoritmo.*/
     public void achaSaida() {
+        if (ambiente.ehSaida(posicao)){
+            ambiente.printMapa();
+            return;
+        }
+
         ArrayList<Ponto> posicoesVizinhas = ambiente.getPosicoesVizinhas(posicao);
         for (Ponto p :
                 posicoesVizinhas) {
@@ -37,6 +47,11 @@ public class Agente {
 
         if (funcaoHeuristica(posicao) > funcaoHeuristica(candidato))
             move(candidato);
+        else {
+            if (Math.exp(funcaoHeuristica(posicao) - funcaoHeuristica(candidato) / temperatura) > ThreadLocalRandom.current().nextDouble())
+                move(candidato);
+        }
+        temperatura *= 1 - taxaResfriamento;
     }
 
     private int funcaoHeuristica(Ponto p) {
@@ -74,5 +89,13 @@ public class Agente {
         Ponto candidato = candidatos.get(rand.ints(0, candidatos.size()).findFirst().getAsInt());
 
         return candidato;
+    }
+
+    public double getTemperatura() {
+        return temperatura;
+    }
+
+    public ArrayList<Ponto> getLugaresVisitados() {
+        return lugaresVisitados;
     }
 }

@@ -42,6 +42,6 @@ public class Ponto {
 
     @Override
     public String toString() {
-        return "Position {x: " + y + ", y: " + x + "} ";
+        return "Position {x: " + x + ", y: " + y + "}";
     }
 }

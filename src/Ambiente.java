@@ -3,7 +3,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashSet;
+import java.util.PriorityQueue;
 
 public class Ambiente {
 
@@ -36,7 +37,7 @@ public class Ambiente {
                 for (String e : array) {
                     switch (e) {
                         case "0":
-                            mapa[i][j] = Posicao.V;
+                            mapa[i][j] = Posicao._;
                             break;
                         case "1":
                             mapa[i][j] = Posicao.P;
@@ -73,7 +74,7 @@ public class Ambiente {
     }
 
     public void moveAgente(Ponto de, Ponto para) {
-        mapa[de.getY()][de.getX()] = Posicao.V;
+        mapa[de.getY()][de.getX()] = Posicao._;
         mapa[entrada.getY()][entrada.getX()] = Posicao.E;
         mapa[saida.getY()][saida.getX()] = Posicao.S;
         mapa[para.getY()][para.getX()] = Posicao.A;
@@ -98,5 +99,63 @@ public class Ambiente {
             }
         }
         return possibleMoves;
+    }
+
+    public boolean ehSaida(Ponto posicao) {
+        return mapa[posicao.getY()][posicao.getX()] == Posicao.S;
+    }
+
+    public ArrayList<Ponto> aEstrela(){
+        PriorityQueue<ElementoFila> open = new PriorityQueue<>(new ElementoFilaComparador());
+        open.add(new ElementoFila(entrada, 0));
+        HashSet<ElementoFila> closed = new HashSet<>();
+        while (open.peek() != null && !open.peek().getPosition().equals(saida)) {
+            ElementoFila lowestRank = open.poll();
+            closed.add(lowestRank);
+            ArrayList<Ponto> possibleMoves = getPosicoesVizinhas(lowestRank.getPosition());
+            for (Ponto neighbor :
+                    possibleMoves) {
+                int cost = lowestRank.getValue() + 1;
+                ElementoFila neighborQueueElement = new ElementoFila(neighbor, cost);
+                if (inOpenCostLess(open, neighborQueueElement))
+                    open.remove(neighborQueueElement);
+                if (notInOpenAndNotInClosed(neighborQueueElement, open, closed))
+                    neighborQueueElement.setValue(cost);
+                neighborQueueElement.setPriority(cost + manhattanDistanceHeuristica(neighbor, saida));
+                neighborQueueElement.setParent(lowestRank);
+                open.add(neighborQueueElement);
+            }
+        }
+        ElementoFila lastVisited = open.peek();
+        if (lastVisited == null)
+            return new ArrayList<>();
+        return reconstructPath(lastVisited);
+    }
+
+    private ArrayList<Ponto> reconstructPath(ElementoFila lastVisited) {
+        ElementoFila current = lastVisited;
+        ArrayList<Ponto> path = new ArrayList<>();
+        while (current.getParent() != null) {
+            path.add(0, current.getPosition());
+            current = current.getParent();
+        }
+        return path;
+    }
+
+    private boolean notInOpenAndNotInClosed(ElementoFila neighbor, PriorityQueue<ElementoFila> open, HashSet<ElementoFila> closed) {
+        return !open.contains(neighbor) && !closed.contains(neighbor);
+    }
+
+    private boolean inOpenCostLess(PriorityQueue<ElementoFila> open, ElementoFila neighbor) {
+        for (ElementoFila qe :
+                open) {
+            if (qe.getPosition().equals(neighbor.getPosition()) && qe.getValue() > neighbor.getValue())
+                return true;
+        }
+        return false;
+    }
+
+    public static int manhattanDistanceHeuristica(Ponto de, Ponto para) {
+        return Math.abs(de.getX() - para.getX()) + Math.abs(de.getY() - para.getY());
     }
 }

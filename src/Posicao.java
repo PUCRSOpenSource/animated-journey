@@ -4,5 +4,5 @@ public enum Posicao {
     S,
     P,
     A,
-    V
+    _
 }
