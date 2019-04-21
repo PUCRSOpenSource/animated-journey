@@ -1,9 +1,9 @@
-import javafx.geometry.Pos;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Ambiente {
 
@@ -13,6 +13,10 @@ public class Ambiente {
     private Ponto saida;
     private int dimensao;
 
+    private int offsetMove[][] = {
+                      {-1, 0},
+            { 0, -1},          { 0, +1},
+                      {+1, 0}};
 
     public void carregaArquivo(String nomeArquivo) {
         StringBuilder sb = new StringBuilder();
@@ -66,13 +70,33 @@ public class Ambiente {
             System.out.print("\n");
         }
         System.out.print("\n");
-        agente.move(new Ponto(2,1));
     }
 
     public void moveAgente(Ponto de, Ponto para) {
-        mapa[de.getY()][para.getX()] = Posicao.V;
+        mapa[de.getY()][de.getX()] = Posicao.V;
         mapa[entrada.getY()][entrada.getX()] = Posicao.E;
         mapa[saida.getY()][saida.getX()] = Posicao.S;
         mapa[para.getY()][para.getX()] = Posicao.A;
+    }
+
+    public Agente getAgente() {
+        return agente;
+    }
+
+    public ArrayList<Ponto> getPosicoesVizinhas(Ponto posicao) {
+        ArrayList<Ponto> possibleMoves = new ArrayList<>();
+        for (int[] off :
+                offsetMove) {
+            int x = posicao.getX() + off[0];
+            if (x < 0 || x >= dimensao)
+                continue;
+            int y = posicao.getY() + off[1];
+            if (y < 0 || y >= dimensao)
+                continue;
+            if (mapa[y][x] != Posicao.P) {
+                possibleMoves.add(new Ponto(x, y));
+            }
+        }
+        return possibleMoves;
     }
 }

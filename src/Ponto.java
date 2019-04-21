@@ -1,6 +1,7 @@
 public class Ponto {
     private int x;
     private int y;
+    private int valor;
 
     public Ponto(int x, int y) {
         this.x = x;
@@ -21,6 +22,14 @@ public class Ponto {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public int getValor() {
+        return valor;
+    }
+
+    public void setValor(int valor) {
+        this.valor = valor;
     }
 
     @Override
