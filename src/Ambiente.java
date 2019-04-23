@@ -106,27 +106,27 @@ public class Ambiente {
     }
 
     public ArrayList<Ponto> aEstrela(){
-        PriorityQueue<ElementoFila> open = new PriorityQueue<>(new ElementoFilaComparador());
-        open.add(new ElementoFila(entrada, 0));
+        PriorityQueue<ElementoFila> naoOlheiAinda = new PriorityQueue<>(new ElementoFilaComparador());
+        naoOlheiAinda.add(new ElementoFila(entrada, 0));
         HashSet<ElementoFila> visitados = new HashSet<>();
-        while (open.peek() != null && !open.peek().getPosition().equals(saida)) {
-            ElementoFila lowestRank = open.poll(); // retira o primeiro elemento (de maior prioridade = menor valor)
-            visitados.add(lowestRank);
-            ArrayList<Ponto> possibleMoves = getPosicoesVizinhas(lowestRank.getPosition());
+        while (naoOlheiAinda.peek() != null && !naoOlheiAinda.peek().getPosition().equals(saida)) {
+            ElementoFila potencialmenteMelhorCanditado = naoOlheiAinda.poll(); // retira o primeiro elemento (de maior prioridade = menor valor)
+            visitados.add(potencialmenteMelhorCanditado);
+            ArrayList<Ponto> movimentosPossiveis = getPosicoesVizinhas(potencialmenteMelhorCanditado.getPosition());
             for (Ponto vizinho :
-                    possibleMoves) {
-                int cost = lowestRank.getValue() + 1;
-                ElementoFila neighborQueueElement = new ElementoFila(vizinho, cost);
-                if (inOpenCostLess(open, neighborQueueElement))
-                    open.remove(neighborQueueElement);
-                if (ehCaraNovo(neighborQueueElement, open, visitados))
-                    neighborQueueElement.setValue(cost);
-                neighborQueueElement.setPriority(cost + manhattanDistanceHeuristica(vizinho, saida));
-                neighborQueueElement.setParent(lowestRank);
-                open.add(neighborQueueElement);
+                    movimentosPossiveis) {
+                int cost = potencialmenteMelhorCanditado.getValue() + 1;
+                ElementoFila vizinhoElementoFila = new ElementoFila(vizinho, cost);
+                if (aindaNaoOlheiMasAcheiMaisBarato(naoOlheiAinda, vizinhoElementoFila))
+                    naoOlheiAinda.remove(vizinhoElementoFila);
+                if (ehCaraNovo(vizinhoElementoFila, naoOlheiAinda, visitados))
+                    vizinhoElementoFila.setValue(cost);
+                vizinhoElementoFila.setPriority(cost + manhattanDistanceHeuristica(vizinho, saida));
+                vizinhoElementoFila.setParent(potencialmenteMelhorCanditado);
+                naoOlheiAinda.add(vizinhoElementoFila);
             }
         }
-        ElementoFila lastVisited = open.peek();
+        ElementoFila lastVisited = naoOlheiAinda.peek();
         if (lastVisited == null)
             return new ArrayList<>();
         return reconstructPath(lastVisited);
@@ -146,7 +146,7 @@ public class Ambiente {
         return !open.contains(neighbor) && !closed.contains(neighbor);
     }
 
-    private boolean inOpenCostLess(PriorityQueue<ElementoFila> open, ElementoFila neighbor) {
+    private boolean aindaNaoOlheiMasAcheiMaisBarato(PriorityQueue<ElementoFila> open, ElementoFila neighbor) {
         for (ElementoFila qe :
                 open) {
             if (qe.getPosition().equals(neighbor.getPosition()) && qe.getValue() > neighbor.getValue())
