@@ -108,20 +108,20 @@ public class Ambiente {
     public ArrayList<Ponto> aEstrela(){
         PriorityQueue<ElementoFila> open = new PriorityQueue<>(new ElementoFilaComparador());
         open.add(new ElementoFila(entrada, 0));
-        HashSet<ElementoFila> closed = new HashSet<>();
+        HashSet<ElementoFila> visitados = new HashSet<>();
         while (open.peek() != null && !open.peek().getPosition().equals(saida)) {
-            ElementoFila lowestRank = open.poll();
-            closed.add(lowestRank);
+            ElementoFila lowestRank = open.poll(); // retira o primeiro elemento (de maior prioridade = menor valor)
+            visitados.add(lowestRank);
             ArrayList<Ponto> possibleMoves = getPosicoesVizinhas(lowestRank.getPosition());
-            for (Ponto neighbor :
+            for (Ponto vizinho :
                     possibleMoves) {
                 int cost = lowestRank.getValue() + 1;
-                ElementoFila neighborQueueElement = new ElementoFila(neighbor, cost);
+                ElementoFila neighborQueueElement = new ElementoFila(vizinho, cost);
                 if (inOpenCostLess(open, neighborQueueElement))
                     open.remove(neighborQueueElement);
-                if (notInOpenAndNotInClosed(neighborQueueElement, open, closed))
+                if (ehCaraNovo(neighborQueueElement, open, visitados))
                     neighborQueueElement.setValue(cost);
-                neighborQueueElement.setPriority(cost + manhattanDistanceHeuristica(neighbor, saida));
+                neighborQueueElement.setPriority(cost + manhattanDistanceHeuristica(vizinho, saida));
                 neighborQueueElement.setParent(lowestRank);
                 open.add(neighborQueueElement);
             }
@@ -142,7 +142,7 @@ public class Ambiente {
         return path;
     }
 
-    private boolean notInOpenAndNotInClosed(ElementoFila neighbor, PriorityQueue<ElementoFila> open, HashSet<ElementoFila> closed) {
+    private boolean ehCaraNovo(ElementoFila neighbor, PriorityQueue<ElementoFila> open, HashSet<ElementoFila> closed) {
         return !open.contains(neighbor) && !closed.contains(neighbor);
     }
 

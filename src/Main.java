@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
         Ambiente a = new Ambiente();
-        a.carregaArquivo("labirintos/labirinto3_20.txt");
+        a.carregaArquivo("labirintos/labirinto1_10.txt");
 
         while (a.getAgente().getTemperatura() > 1) {
             //a.printMapa();

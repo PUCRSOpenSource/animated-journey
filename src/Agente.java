@@ -5,7 +5,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Agente {
 
     private Ponto posicao;
-    private Direcao direcao;
     private Ambiente ambiente;
     private ArrayList<Ponto> lugaresVisitados;
     private double temperatura;
@@ -16,7 +15,6 @@ public class Agente {
         lugaresVisitados = new ArrayList<>();
         lugaresVisitados.add(posicao);
         this.ambiente = ambiente;
-        direcao = Direcao.NORTH;
         temperatura = 10000000;
         taxaResfriamento = 0.003;
     }
